@@ -23,6 +23,8 @@ Base : `http://localhost:3000/api`. Erreurs au format `{ "error": "..." }` (plus
 | POST | `/tickets` | Ouvrir | 201, 400, 404 |
 | PATCH | `/tickets/{id}/assignation` | Assigner à un technicien | 200, 400, 404 |
 | PATCH | `/tickets/{id}/status` | Faire évoluer le statut | 200, 400, 404 |
+| GET | `/datacenters` | Lister | 200 |
+| GET | `/datacenters/{id}` | Consulter | 200, 404 |
 | GET | `/techniciens` | Lister | 200 |
 | GET | `/techniciens/{id}` | Consulter | 200, 404 |
 | GET | `/techniciens/{id}/tickets` | Tickets non fermés, triés par priorité | 200, 404 |
