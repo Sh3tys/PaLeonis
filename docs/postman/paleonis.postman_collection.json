@@ -1,0 +1,1113 @@
+{
+  "info": {
+    "name": "PaLeonis API (TP 4 hybride)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api"
+    }
+  ],
+  "item": [
+    {
+      "name": "Clients",
+      "item": [
+        {
+          "name": "Lister les clients",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/clients",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "clients"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Consulter un client",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/clients/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "clients",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Créer un client",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/clients",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "clients"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"PARTICULIER\",\n  \"email\": \"alice@mail.fr\",\n  \"tel\": \"0600000000\",\n  \"nom\": \"Durand\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Fiche client",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/clients/1/fiche",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "clients",
+                "1",
+                "fiche"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Offres",
+      "item": [
+        {
+          "name": "Lister les offres",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/offres?categorie=VPS&en_vente=true",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "offres"
+              ],
+              "query": [
+                {
+                  "key": "categorie",
+                  "value": "VPS"
+                },
+                {
+                  "key": "en_vente",
+                  "value": "true"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Consulter une offre (avec fiche)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/offres/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "offres",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Créer une offre",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/offres",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "offres"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"VPS Test\",\n  \"categorie\": \"VPS\",\n  \"prix_mensuel_ht\": 9.99\n}"
+            }
+          }
+        },
+        {
+          "name": "Modifier une offre",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/offres/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "offres",
+                "1"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prix_mensuel_ht\": 6.49\n}"
+            }
+          }
+        },
+        {
+          "name": "Retirer une offre",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/offres/1/retrait",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "offres",
+                "1",
+                "retrait"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Supprimer une offre (et sa fiche)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/offres/6",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "offres",
+                "6"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "N1 - Fiches techniques",
+      "item": [
+        {
+          "name": "Consulter une fiche",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/offres/2/fiche",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "offres",
+                "2",
+                "fiche"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Créer/remplacer fiche VPS",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/offres/2/fiche",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "offres",
+                "2",
+                "fiche"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vcpu\": 4,\n  \"ramGo\": 8,\n  \"stockageGo\": 160,\n  \"typeStockage\": \"NVMe\",\n  \"systeme\": \"Ubuntu 24.04 LTS\",\n  \"caracteristiques\": {\n    \"ipv6\": true\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Fiche VPS sans RAM (422)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/offres/1/fiche",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "offres",
+                "1",
+                "fiche"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vcpu\": 1,\n  \"stockageGo\": 40,\n  \"systeme\": \"Debian 12\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Créer/remplacer fiche domaine",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/offres/5/fiche",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "offres",
+                "5",
+                "fiche"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"extension\": \".fr\",\n  \"registrar\": \"AFNIC\",\n  \"dureeEngagementMois\": 12\n}"
+            }
+          }
+        },
+        {
+          "name": "Créer/remplacer fiche dédié",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/offres/4/fiche",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "offres",
+                "4",
+                "fiche"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"processeur\": \"AMD EPYC 4344P\",\n  \"ramGo\": 64,\n  \"disques\": [\n    {\n      \"type\": \"NVMe\",\n      \"capaciteGo\": 960\n    }\n  ],\n  \"bandePassanteMbps\": 1000\n}"
+            }
+          }
+        },
+        {
+          "name": "Fiche d'une offre inexistante (404)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/offres/999/fiche",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "offres",
+                "999",
+                "fiche"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vcpu\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Recherche plein texte",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/offres/recherche?q=NVMe",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "offres",
+                "recherche"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "NVMe"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Abonnements",
+      "item": [
+        {
+          "name": "Lister",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/abonnements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "abonnements"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Consulter",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/abonnements/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "abonnements",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Souscrire",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/abonnements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "abonnements"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"client_id\": 1,\n  \"offre_id\": 2\n}"
+            }
+          }
+        },
+        {
+          "name": "Résilier",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/abonnements/1/resiliation",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "abonnements",
+                "1",
+                "resiliation"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Serveurs",
+      "item": [
+        {
+          "name": "Lister",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/serveurs?statut=EN_SERVICE",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "serveurs"
+              ],
+              "query": [
+                {
+                  "key": "statut",
+                  "value": "EN_SERVICE"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Consulter",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/serveurs/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "serveurs",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Supprimer un serveur (et son journal)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/serveurs/2",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "serveurs",
+                "2"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "N2 - Journal d'activité",
+      "item": [
+        {
+          "name": "Événement alerte",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/serveurs/1/evenements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "serveurs",
+                "1",
+                "evenements"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"ALERTE\",\n  \"niveau\": \"CRITIQUE\",\n  \"message\": \"Disque /var rempli à 95 %\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Événement métrique",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/serveurs/1/evenements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "serveurs",
+                "1",
+                "evenements"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"METRIQUE\",\n  \"cpu\": 87.5,\n  \"ram\": 71.2,\n  \"disque\": 95\n}"
+            }
+          }
+        },
+        {
+          "name": "Événement redémarrage",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/serveurs/1/evenements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "serveurs",
+                "1",
+                "evenements"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"REDEMARRAGE\",\n  \"motif\": \"Mise à jour du noyau\",\n  \"planifie\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Événement maintenance",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/serveurs/2/evenements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "serveurs",
+                "2",
+                "evenements"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"MAINTENANCE\",\n  \"technicienId\": 1,\n  \"description\": \"Remplacement RAM\",\n  \"dureeMinutes\": 45\n}"
+            }
+          }
+        },
+        {
+          "name": "Type inconnu (422)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/serveurs/1/evenements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "serveurs",
+                "1",
+                "evenements"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"PANNE\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Serveur inexistant (404)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/serveurs/999/evenements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "serveurs",
+                "999",
+                "evenements"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"METRIQUE\",\n  \"cpu\": 1,\n  \"ram\": 1,\n  \"disque\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Lister les événements",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/serveurs/1/evenements?type=ALERTE&debut=2026-10-01&fin=2026-12-31&limite=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "serveurs",
+                "1",
+                "evenements"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "ALERTE"
+                },
+                {
+                  "key": "debut",
+                  "value": "2026-10-01"
+                },
+                {
+                  "key": "fin",
+                  "value": "2026-12-31"
+                },
+                {
+                  "key": "limite",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Statistiques par type",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/serveurs/1/evenements/stats",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "serveurs",
+                "1",
+                "evenements",
+                "stats"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Alertes par jour (7 jours)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/serveurs/alertes/par-jour",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "serveurs",
+                "alertes",
+                "par-jour"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tickets",
+      "item": [
+        {
+          "name": "Ouvrir",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tickets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tickets"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientId\": 1,\n  \"serveurId\": 1,\n  \"sujet\": \"Lenteurs\",\n  \"description\": \"Le site est lent.\",\n  \"priorite\": \"HAUTE\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Assigner",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tickets/1/assignation",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tickets",
+                "1",
+                "assignation"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"technicienId\": 2\n}"
+            }
+          }
+        },
+        {
+          "name": "Changer le statut",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tickets/1/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tickets",
+                "1",
+                "status"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"statut\": \"RESOLU\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Supprimer un ticket (et ses messages)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tickets/3",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tickets",
+                "3"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "N3 - Messages de tickets",
+      "item": [
+        {
+          "name": "Consulter un ticket avec son fil",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tickets/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tickets",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Message du client",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tickets/1/messages",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tickets",
+                "1",
+                "messages"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"auteur\": {\n    \"type\": \"CLIENT\",\n    \"id\": 1\n  },\n  \"contenu\": \"Ça fonctionne à nouveau, merci !\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Message d'un technicien avec pièce jointe",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tickets/1/messages",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tickets",
+                "1",
+                "messages"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"auteur\": {\n    \"type\": \"TECHNICIEN\",\n    \"id\": 1\n  },\n  \"contenu\": \"Voici le journal.\",\n  \"piecesJointes\": [\n    {\n      \"nom\": \"journal.txt\",\n      \"url\": \"https://files.paleonis.fr/t1/journal.txt\"\n    }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Client étranger au ticket (403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tickets/1/messages",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tickets",
+                "1",
+                "messages"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"auteur\": {\n    \"type\": \"CLIENT\",\n    \"id\": 2\n  },\n  \"contenu\": \"Bonjour\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Technicien inexistant (404)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tickets/1/messages",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tickets",
+                "1",
+                "messages"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"auteur\": {\n    \"type\": \"TECHNICIEN\",\n    \"id\": 99\n  },\n  \"contenu\": \"Bonjour\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Techniciens et dashboard",
+      "item": [
+        {
+          "name": "Lister les techniciens",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/techniciens",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "techniciens"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Consulter un technicien",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/techniciens/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "techniciens",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Tickets d'un technicien",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/techniciens/1/tickets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "techniciens",
+                "1",
+                "tickets"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Revenus",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/revenus",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dashboard",
+                "revenus"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Serveurs par datacenter",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/serveurs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dashboard",
+                "serveurs"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
