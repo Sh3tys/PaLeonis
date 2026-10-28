@@ -1,5 +1,6 @@
 require("dotenv").config();
 const express = require("express");
+
 const ticketRoutes = require("./routes/ticket.routes");
 const serveurRoutes = require("./routes/serveur.routes");
 const abonnementRoutes = require("./routes/abonnement.routes");
@@ -7,6 +8,8 @@ const catalogueRoutes = require("./routes/catalogue.routes");
 const dashboardRoutes = require("./routes/dashboard.routes");
 const technicienRoutes = require("./routes/technicien.routes");
 const clientRoutes = require("./routes/client.route");
+const datacenterRoutes = require("./routes/datacenter.routes");
+
 const pool = require("./db");
 const connectMongo = require("./config/mongo");
 
@@ -20,6 +23,7 @@ app.use("/api", serveurRoutes);
 app.use("/api", abonnementRoutes);
 app.use("/api", catalogueRoutes);
 app.use("/api/clients", clientRoutes);
+app.use("/api/datacenters", datacenterRoutes);
 app.use("/api", dashboardRoutes);
 app.use("/api", technicienRoutes);
 
