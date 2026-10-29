@@ -1,3 +1,5 @@
+// Routes : associe chaque URL + méthode HTTP à une fonction du contrôleur. Aucune logique ici.
+
 const express = require("express");
 const {
   listAbonnements,
@@ -8,11 +10,13 @@ const {
 
 const router = express.Router();
 
-router.get("/abonnements", listAbonnements); // List subscriptions
-router.get("/abonnements/:id", getAbonnement); // Get a specific subscription by ID
+router.get("/abonnements", listAbonnements);
+router.get("/abonnements/:id", getAbonnement);
 
-router.post("/abonnements", createAbonnement); // Subscribe and assign a free server
+// Souscription : attribue automatiquement un serveur libre du datacenter demandé.
+router.post("/abonnements", createAbonnement);
 
-router.patch("/abonnements/:id/resiliation", resilierAbonnement); // Cancel and free the server
+// Résiliation : PATCH car on modifie l'état, on ne supprime pas la ligne.
+router.patch("/abonnements/:id/resiliation", resilierAbonnement);
 
 module.exports = router;

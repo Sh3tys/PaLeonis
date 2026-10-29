@@ -1,5 +1,8 @@
+// Modèle SQL : seul endroit qui écrit des requêtes vers PostgreSQL pour cette table.
+
 const pool = require("../db");
 
+// Champs privés (#) + getters : l'objet est en lecture seule depuis l'extérieur.
 class Ticket {
   #id;
   #clientId;
@@ -11,6 +14,7 @@ class Ticket {
   #priorite;
   #statut;
 
+  // Machine à états : pour chaque statut, les statuts suivants autorisés.
   static #TRANSITIONS = {
     OUVERT: ["EN_COURS"],
     EN_COURS: ["RESOLU"],
@@ -98,10 +102,12 @@ class Ticket {
     this.#statut = statut;
   }
 
+  // Règle métier portée par l'objet : le contrôleur demande, le modèle décide.
   peutPasserA(statut) {
     return Ticket.#TRANSITIONS[this.#statut].includes(statut);
   }
 
+  // Appelé automatiquement par res.json() : définit la forme exacte renvoyée par l'API.
   toJSON() {
     return {
       id: this.#id,
@@ -116,6 +122,7 @@ class Ticket {
     };
   }
 
+  // Convertit une ligne SQL (snake_case) en instance du modèle.
   static #fromRow(row) {
     return new Ticket({
       id: row.id,
@@ -130,6 +137,7 @@ class Ticket {
     });
   }
 
+  // COALESCE applique la priorité NORMALE si aucune n'est fournie.
   static async create(clientId, serveurId, sujet, description, priorite) {
     const { rows } = await pool.query(
       `INSERT INTO ticket (client_id, serveur_id, sujet, description, priorite)

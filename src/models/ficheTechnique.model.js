@@ -1,19 +1,25 @@
+// Modèle MongoDB (Mongoose) : le schéma valide chaque document avant écriture.
+// Fiche technique d'une offre : sa structure dépend de la catégorie, d'où MongoDB
+// et un discriminator (sous-schéma) par catégorie dans une seule collection.
+
 const { Schema, model } = require("mongoose");
 
-// Une seule collection, un schéma par catégorie d'offre (discriminators).
 const ficheSchema = new Schema(
   {
-    offreId: { type: Number, required: true, unique: true }, // id PostgreSQL de l'offre
-    // Caractéristiques libres : le commercial peut en ajouter sans migration.
+    // Id de l'offre dans PostgreSQL ; unique = une seule fiche par offre.
+    offreId: { type: Number, required: true, unique: true },
+    // Champ libre : on peut ajouter des informations sans modifier le schéma.
     caracteristiques: { type: Schema.Types.Mixed, default: {} },
   },
   { discriminatorKey: "categorie", timestamps: true, versionKey: false },
 );
 
+// Index texte sur tous les champs : permet la recherche $text.
 ficheSchema.index({ "$**": "text" });
 
 const FicheTechnique = model("FicheTechnique", ficheSchema, "fiches_techniques");
 
+// Un sous-schéma par catégorie d'offre.
 FicheTechnique.discriminator(
   "VPS",
   new Schema({
@@ -65,7 +71,8 @@ FicheTechnique.discriminator(
 
 FicheTechnique.findByOffre = (offreId) => FicheTechnique.findOne({ offreId });
 
-// Remplace (ou crée) la fiche d'une offre. La catégorie vient de PostgreSQL.
+// Remplace (ou crée) la fiche. Valide d'abord, pour ne pas supprimer
+// l'ancienne fiche si la nouvelle est invalide.
 FicheTechnique.remplacer = async (offreId, categorie, dto) => {
   const { _id, createdAt, updatedAt, ...data } = dto ?? {};
   const Fiche = FicheTechnique.discriminators[categorie];

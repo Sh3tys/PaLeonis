@@ -1,3 +1,6 @@
+// Modèle SQL : seul endroit qui écrit des requêtes vers PostgreSQL pour cette table.
+// Version minimale : renvoie directement les lignes, sans classe d'instance.
+
 const pool = require("../db");
 
 class Datacenter {

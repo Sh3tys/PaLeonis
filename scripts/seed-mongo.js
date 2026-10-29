@@ -1,5 +1,6 @@
-// Jeu d'essai MongoDB, cohérent avec les ids de database/seed.sql.
-// Usage : node scripts/seed-mongo.js
+// Jeu d'essai MongoDB, cohérent avec les ids insérés par database/seed.sql.
+// Usage : node scripts/seed-mongo.js (vide puis remplit les collections).
+
 require("dotenv").config();
 const mongoose = require("mongoose");
 const FicheTechnique = require("../src/models/ficheTechnique.model");
@@ -8,6 +9,7 @@ const Message = require("../src/models/message.model");
 
 const HEURE = 60 * 60 * 1000;
 const JOUR = 24 * HEURE;
+// Dates relatives à maintenant, pour que les données restent "récentes" à chaque seed.
 const ilYa = (ms) => new Date(Date.now() - ms);
 
 // Une fiche par offre (offres 1 à 5 de seed.sql).
@@ -41,7 +43,7 @@ const fiches = [
   },
 ];
 
-// Au moins 50 événements sur les serveurs 1 à 3, répartis sur 10 jours.
+// Une cinquantaine d'événements sur les serveurs 1 à 3, répartis sur 10 jours.
 const evenements = [];
 for (const serveurId of [1, 2, 3]) {
   for (let jour = 0; jour < 10; jour++) {
@@ -83,7 +85,7 @@ evenements.push(
   },
 );
 
-// Fils de messages : ticket 1 (client 1, technicien 1) et ticket 2 (client 2).
+// Fils de messages des tickets 1 et 2.
 const messages = [
   { ticketId: 1, auteur: { type: "CLIENT", id: 1 }, createdAt: ilYa(5 * HEURE),
     contenu: "Bonjour, mon serveur ne répond plus en SSH depuis ce matin." },
@@ -106,12 +108,14 @@ const messages = [
 
 const seed = async () => {
   await mongoose.connect(process.env.MONGO_URI);
+  // init() crée les index (unique, texte, TTL) avant d'insérer.
   await Promise.all([FicheTechnique.init(), Evenement.init(), Message.init()]);
 
   await FicheTechnique.deleteMany({});
   await Evenement.deleteMany({});
   await Message.deleteMany({});
 
+  // Création via le discriminator pour que chaque document soit validé par son sous-schéma.
   for (const fiche of fiches) {
     await FicheTechnique.discriminators[fiche.categorie].create(fiche);
   }

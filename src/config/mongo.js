@@ -1,3 +1,6 @@
+// Connexion MongoDB via Mongoose. Une seule connexion globale suffit :
+// tous les modèles Mongoose l'utilisent automatiquement ensuite.
+
 const mongoose = require("mongoose");
 
 async function connectMongo() {

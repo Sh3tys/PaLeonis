@@ -1,5 +1,9 @@
+// Modèle SQL : seul endroit qui écrit des requêtes vers PostgreSQL pour cette table.
+// Contient la souscription, faite dans une transaction pour rester cohérente.
+
 const pool = require("../db");
 
+// Crée une erreur portant un code HTTP : server.js la renverra telle quelle au client.
 const httpError = (status, message) => {
   const error = new Error(message);
   error.status = status;
@@ -8,6 +12,7 @@ const httpError = (status, message) => {
 
 const isPositiveInt = (value) => Number.isInteger(value) && value > 0;
 
+// Champs privés (#) + getters : l'objet est en lecture seule depuis l'extérieur.
 class Abonnement {
   #id;
   #clientId;
@@ -70,6 +75,7 @@ class Abonnement {
     return this.#prixApplique;
   }
 
+  // Appelé automatiquement par res.json() : définit la forme exacte renvoyée par l'API.
   toJSON() {
     return {
       id: this.#id,
@@ -83,6 +89,8 @@ class Abonnement {
     };
   }
 
+  // Convertit une ligne SQL (snake_case) en instance du modèle.
+  // NUMERIC arrive en chaîne depuis pg : Number() le remet en nombre.
   static #fromRow(row) {
     return new Abonnement(
       row.id,
@@ -106,6 +114,7 @@ class Abonnement {
     return rows[0] ? Abonnement.#fromRow(rows[0]) : null;
   }
 
+  // Souscription : valide l'entrée, puis vérifie et réserve un serveur dans une seule transaction.
   static async createOne(dto) {
     const { client_id, offre_id, datacenter_id } = dto ?? {};
 
@@ -119,6 +128,7 @@ class Abonnement {
       throw httpError(400, "datacenter_id est obligatoire et doit être un entier positif.");
     }
 
+    // Une transaction exige la même connexion pour toutes ses requêtes : on la prend au pool.
     const db = await pool.connect();
     try {
       await db.query("BEGIN");
@@ -146,6 +156,8 @@ class Abonnement {
         throw httpError(404, "Datacenter introuvable.");
       }
 
+      // Premier serveur libre du datacenter. FOR UPDATE SKIP LOCKED verrouille la ligne :
+      // deux souscriptions simultanées ne peuvent pas obtenir le même serveur.
       const serveur = await db.query(
         `SELECT s.id FROM serveur s
          WHERE s.datacenter_id = $1
@@ -170,16 +182,19 @@ class Abonnement {
       await db.query("COMMIT");
       return Abonnement.findById(rows[0].id);
     } catch (error) {
+      // Toute erreur annule l'ensemble de la transaction.
       await db.query("ROLLBACK");
       if (error.code === "23505") {
         throw httpError(409, "Ce serveur vient d'être attribué, réessayez.");
       }
       throw error;
     } finally {
+      // Toujours rendre la connexion au pool, même en cas d'erreur.
       db.release();
     }
   }
   
+  // Résiliation : on garde la ligne pour l'historique et on libère le serveur.
   static async resilier(id) {
     const abonnement = await Abonnement.findById(id);
     if (!abonnement) {

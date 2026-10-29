@@ -1,3 +1,6 @@
+// Modèle SQL de statistiques : agrégations (SUM, COUNT, GROUP BY) calculées par PostgreSQL.
+// ::float / ::int convertissent les résultats pour que pg renvoie des nombres et non des chaînes.
+
 const pool = require("../db");
 
 class Dashboard {

@@ -1,3 +1,6 @@
+-- Jeu d'essai PostgreSQL, exécuté après schema.sql au premier démarrage du conteneur.
+-- Les ids générés (1, 2, 3...) sont réutilisés par scripts/seed-mongo.js.
+
 BEGIN;
 
 INSERT INTO datacenter (nom, ville) VALUES
@@ -20,6 +23,7 @@ INSERT INTO technicien (datacenter_id, nom, prenom, mail_pro) VALUES
     (1, 'Dupont', 'Marie', 'm.dupont@hosting.fr'),
     (2, 'Nguyen', 'Luc',   'l.nguyen@hosting.fr');
 
+-- CTE : insère le client et réutilise son id généré pour la ligne du sous-type.
 WITH c AS (
     INSERT INTO client (type, email, tel) VALUES ('PARTICULIER', 'jean.martin@mail.fr', '0612345678')
     RETURNING id

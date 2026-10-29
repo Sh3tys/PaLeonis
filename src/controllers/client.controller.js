@@ -1,5 +1,10 @@
+// Contrôleur : lit la requête (params, query, body), appelle le modèle, choisit le code HTTP.
+// Pas de SQL ici. Les erreurs non gérées remontent au gestionnaire central de server.js.
+// Variante : ici la validation et le try/catch sont faits dans le contrôleur.
+
 const Client = require("../models/client.model");
 
+// Doit rester aligné avec l'ENUM type_client de database/schema.sql.
 const TYPES = ["PARTICULIER", "ENTREPRISE"];
 
 const listClients = async (req, res) => {
@@ -70,6 +75,7 @@ const createClient = async (req, res) => {
     const client = await Client.createOne(req.body);
     return res.status(201).json(client);
   } catch (error) {
+    // PostgreSQL : violation d'unicité (email ou siret déjà utilisé).
     if (error.code === "23505") {
       return res
         .status(409)

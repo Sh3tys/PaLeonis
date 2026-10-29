@@ -1,4 +1,7 @@
+# Lance l'infrastructure PostgreSQL en local : docker compose up -d
+# MongoDB n'est pas ici : il tourne à part (service mongod ou conteneur mongo:7).
 services:
+  # Base relationnelle. Les variables viennent du .env, avec une valeur par défaut après ":-".
   db:
     image: postgres:16-alpine
     container_name: hosting_db
@@ -11,8 +14,12 @@ services:
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
+      # Volume nommé : les données survivent à un redémarrage du conteneur.
       - db_data:/var/lib/postgresql/data
+      # Au tout premier démarrage, Postgres exécute les .sql de ce dossier par ordre alphabétique
+      # (schema.sql puis seed.sql). Pour rejouer : docker compose down -v && docker compose up -d
       - ./database:/docker-entrypoint-initdb.d:ro
+    # Permet à Adminer d'attendre que la base accepte vraiment les connexions.
     healthcheck:
       test:
         [
@@ -23,6 +30,7 @@ services:
       timeout: 5s
       retries: 10
 
+  # Interface web pour consulter la base : http://localhost:8080 (serveur "db").
   adminer:
     image: adminer:latest
     container_name: hosting_adminer

@@ -1,5 +1,8 @@
+// Modèle SQL : seul endroit qui écrit des requêtes vers PostgreSQL pour cette table. (table offre).
+
 const pool = require("../db");
 
+// Doit rester aligné avec l'ENUM categorie_offre de database/schema.sql.
 const CATEGORIES = [
   "VPS",
   "HEBERGEMENT_MUTUALISE",
@@ -7,12 +10,14 @@ const CATEGORIES = [
   "NOM_DE_DOMAINE",
 ];
 
+// Crée une erreur portant un code HTTP : server.js la renverra telle quelle au client.
 const httpError = (status, message) => {
   const error = new Error(message);
   error.status = status;
   return error;
 };
 
+// Champs privés (#) + getters : l'objet est en lecture seule depuis l'extérieur.
 class Catalogue {
   #id;
   #nom;
@@ -44,6 +49,7 @@ class Catalogue {
     return this.#enVente;
   }
 
+  // Appelé automatiquement par res.json() : définit la forme exacte renvoyée par l'API.
   toJSON() {
     return {
       id: this.#id,
@@ -54,7 +60,7 @@ class Catalogue {
     };
   }
 
-  // STATIC
+  // Convertit une ligne SQL (snake_case) en instance du modèle.
   static #fromRow(row) {
     return new Catalogue(
       row.id,
@@ -65,6 +71,8 @@ class Catalogue {
     );
   }
 
+  // Validation des données reçues. partial = true pour une mise à jour :
+  // seuls les champs envoyés sont contrôlés.
   static #validate({ nom, categorie, prix_mensuel_ht, en_vente }, partial) {
     if (!partial || nom !== undefined) {
       if (typeof nom !== "string" || nom.trim() === "") {
@@ -97,6 +105,8 @@ class Catalogue {
       throw httpError(400, "en_vente doit valoir true ou false.");
     }
     const { rows } = await pool.query(
+      // Filtre facultatif : un paramètre NULL désactive sa condition. Les valeurs passent
+      // toujours par $1, $2... (requête paramétrée), jamais par concaténation : pas d'injection SQL.
       `SELECT * FROM offre
        WHERE ($1::categorie_offre IS NULL OR categorie = $1)
          AND ($2::boolean IS NULL OR en_vente = $2)
@@ -135,6 +145,7 @@ class Catalogue {
     const data = dto ?? {};
     Catalogue.#validate(data, true);
     const { rows } = await pool.query(
+      // COALESCE garde l'ancienne valeur quand le champ n'est pas envoyé (mise à jour partielle).
       `UPDATE offre SET
          nom             = COALESCE($2, nom),
          categorie       = COALESCE($3::categorie_offre, categorie),
@@ -158,6 +169,7 @@ class Catalogue {
       const { rowCount } = await pool.query("DELETE FROM offre WHERE id = $1", [id]);
       return rowCount > 0;
     } catch (error) {
+      // La clé étrangère d'abonnement bloque la suppression d'une offre utilisée.
       if (error.code === "23503") {
         throw httpError(409, "Offre encore utilisée par des abonnements.");
       }

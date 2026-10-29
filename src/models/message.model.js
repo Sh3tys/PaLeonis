@@ -1,12 +1,16 @@
+// Modèle MongoDB (Mongoose) : le schéma valide chaque document avant écriture.
+// Un document par message, relié au ticket PostgreSQL par ticketId (référence, pas de jointure possible).
+
 const { Schema, model } = require("mongoose");
 
-// Messages référencés : un document par message, rattaché au ticket PostgreSQL par ticketId.
 const messageSchema = new Schema(
   {
-    ticketId: { type: Number, required: true }, // id PostgreSQL du ticket
+    // Id du ticket dans PostgreSQL.
+    ticketId: { type: Number, required: true },
     auteur: {
       type: { type: String, enum: ["CLIENT", "TECHNICIEN"], required: true },
-      id: { type: Number, required: true }, // id PostgreSQL du client ou du technicien
+      // Id du client ou du technicien dans PostgreSQL.
+      id: { type: Number, required: true },
     },
     contenu: { type: String, required: true, trim: true, maxlength: 5000 },
     piecesJointes: [
@@ -17,10 +21,11 @@ const messageSchema = new Schema(
       },
     ],
   },
+  // createdAt automatique ; pas d'updatedAt car un message n'est jamais modifié. Pas de champ __v.
   { timestamps: { createdAt: true, updatedAt: false }, versionKey: false },
 );
 
-// Le fil se lit en entier, dans l'ordre chronologique.
+// Index adapté à la seule lecture faite : tout le fil d'un ticket, dans l'ordre chronologique.
 messageSchema.index({ ticketId: 1, createdAt: 1 });
 
 const Message = model("Message", messageSchema, "messages");
