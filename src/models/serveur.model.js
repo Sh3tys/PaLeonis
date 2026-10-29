@@ -1,5 +1,8 @@
+// Modèle SQL : seul endroit qui écrit des requêtes vers PostgreSQL pour cette table.
+
 const pool = require("../db");
 
+// Champs privés (#) + getters : l'objet est en lecture seule depuis l'extérieur.
 class Serveur {
   #id;
   #datacenterId;
@@ -9,6 +12,7 @@ class Serveur {
   #dateMiseEnService;
   #attribue;
 
+  // Requête de base : le LEFT JOIN calcule "attribue" (le serveur a-t-il un abonnement ?).
   static #SELECT = `
     SELECT s.*, a.id IS NOT NULL AS attribue
     FROM serveur s
@@ -76,6 +80,7 @@ class Serveur {
     this.#attribue = attribue;
   }
 
+  // Appelé automatiquement par res.json() : définit la forme exacte renvoyée par l'API.
   toJSON() {
     return {
       id: this.#id,
@@ -88,6 +93,7 @@ class Serveur {
     };
   }
 
+  // Convertit une ligne SQL (snake_case) en instance du modèle.
   static #fromRow(row) {
     return new Serveur(
       row.id,
@@ -100,6 +106,7 @@ class Serveur {
     );
   }
 
+  // Filtres facultatifs : un paramètre NULL désactive sa condition.
   static async findAll(datacenter, statut, attribue) {
     const { rows } = await pool.query(
       `${Serveur.#SELECT}

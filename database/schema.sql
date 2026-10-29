@@ -1,5 +1,10 @@
+-- Structure de la base PostgreSQL (tables, types, contraintes).
+-- Exécuté automatiquement par Docker au premier démarrage, avant seed.sql (ordre alphabétique).
+
+-- Tout dans une transaction : soit le schéma entier est créé, soit rien.
 BEGIN;
 
+-- ENUM : la base refuse toute valeur hors liste. Les mêmes listes existent côté JS.
 CREATE TYPE type_client        AS ENUM ('PARTICULIER', 'ENTREPRISE');
 CREATE TYPE categorie_offre    AS ENUM ('VPS', 'HEBERGEMENT_MUTUALISE', 'SERVEUR_DEDIE', 'NOM_DE_DOMAINE');
 CREATE TYPE statut_abonnement  AS ENUM ('ACTIF', 'SUSPENDU', 'RESILIE');
@@ -7,6 +12,8 @@ CREATE TYPE statut_serveur     AS ENUM ('EN_SERVICE', 'MAINTENANCE', 'HORS_SERVI
 CREATE TYPE priorite_ticket    AS ENUM ('BASSE', 'NORMALE', 'HAUTE', 'CRITIQUE');
 CREATE TYPE statut_ticket      AS ENUM ('OUVERT', 'EN_COURS', 'RESOLU', 'FERME');
 
+-- Héritage : client contient le commun, particulier / entreprise le spécifique.
+-- UNIQUE (id, type) sert de cible aux clés étrangères composées des sous-tables.
 CREATE TABLE client (
     id               INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     type             type_client  NOT NULL,
@@ -18,6 +25,8 @@ CREATE TABLE client (
     CONSTRAINT client_id_type_key UNIQUE (id, type)
 );
 
+-- Le CHECK sur type + la FK composée garantissent qu'un client PARTICULIER
+-- ne peut pas avoir de ligne dans entreprise (et inversement).
 CREATE TABLE particulier (
     client_id INTEGER PRIMARY KEY,
     type      type_client  NOT NULL DEFAULT 'PARTICULIER'
@@ -37,6 +46,7 @@ CREATE TABLE entreprise (
         FOREIGN KEY (client_id, type) REFERENCES client (id, type) ON DELETE CASCADE
 );
 
+-- Catalogue commercial. La fiche technique détaillée est dans MongoDB (offreId).
 CREATE TABLE offre (
     id               INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nom              VARCHAR(100)   NOT NULL,
@@ -53,6 +63,7 @@ CREATE TABLE datacenter (
     ville VARCHAR(100) NOT NULL
 );
 
+-- INET : type PostgreSQL dédié aux adresses IP (validées par la base).
 CREATE TABLE serveur (
     id                    INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     datacenter_id         INTEGER        NOT NULL REFERENCES datacenter (id) ON DELETE RESTRICT,
@@ -72,6 +83,8 @@ CREATE TABLE technicien (
     mail_pro      VARCHAR(255) NOT NULL UNIQUE
 );
 
+-- serveur_id UNIQUE : un serveur ne sert qu'un seul abonnement à la fois.
+-- prix_applique fige le prix au moment de la souscription.
 CREATE TABLE abonnement (
     id            INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     client_id     INTEGER           NOT NULL REFERENCES client (id)  ON DELETE RESTRICT,
@@ -87,6 +100,7 @@ CREATE TABLE abonnement (
     CONSTRAINT abonnement_resilie_chk CHECK (statut <> 'RESILIE' OR date_fin IS NOT NULL)
 );
 
+-- Les messages du ticket sont dans MongoDB (ticketId).
 CREATE TABLE ticket (
     id             INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     client_id      INTEGER         NOT NULL REFERENCES client (id)     ON DELETE CASCADE,
@@ -101,6 +115,7 @@ CREATE TABLE ticket (
     modifie_le     TIMESTAMPTZ     NOT NULL DEFAULT now()
 );
 
+-- Met à jour modifie_le automatiquement à chaque UPDATE, sans dépendre de l'API.
 CREATE OR REPLACE FUNCTION set_modifie_le() RETURNS TRIGGER AS $$
 BEGIN
     NEW.modifie_le := now();
@@ -108,6 +123,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Pose le trigger sur chaque table qui a une colonne modifie_le.
 DO $$
 DECLARE t TEXT;
 BEGIN

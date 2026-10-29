@@ -1,31 +1,38 @@
+// Modèle MongoDB (Mongoose) : le schéma valide chaque document avant écriture.
+// Journal d'activité des serveurs : beaucoup d'écritures, aucune modification.
+// Discriminators = une seule collection, mais un schéma différent par type d'événement.
+
 const { Schema, model } = require("mongoose");
 
 const TYPES = ["REDEMARRAGE", "ALERTE", "MAINTENANCE", "METRIQUE"];
 const NIVEAUX = ["INFO", "AVERTISSEMENT", "CRITIQUE"];
+// En secondes, comme l'attend l'option expireAfterSeconds.
 const QUATRE_VINGT_DIX_JOURS = 90 * 24 * 60 * 60;
 
+// Crée une erreur portant un code HTTP : server.js la renverra telle quelle au client.
 const httpError = (status, message) => {
   const error = new Error(message);
   error.status = status;
   return error;
 };
 
-// Journal en écriture seule : pas de updatedAt, un schéma par type (discriminators).
 const evenementSchema = new Schema(
   {
-    serveurId: { type: Number, required: true }, // id PostgreSQL du serveur
+    // Id du serveur dans PostgreSQL.
+    serveurId: { type: Number, required: true },
     date: { type: Date, default: Date.now },
   },
   {
+    // Le champ "type" indique quel sous-schéma s'applique au document.
     discriminatorKey: "type",
     timestamps: { createdAt: true, updatedAt: false },
     versionKey: false,
   },
 );
 
-// Lecture du plus récent au plus ancien, serveur par serveur.
+// Lecture typique : les événements d'un serveur, du plus récent au plus ancien.
 evenementSchema.index({ serveurId: 1, date: -1 });
-// Les relevés de métriques expirent tout seuls au bout de 90 jours.
+// Index TTL partiel : MongoDB supprime seul les METRIQUE de plus de 90 jours.
 evenementSchema.index(
   { date: 1 },
   { expireAfterSeconds: QUATRE_VINGT_DIX_JOURS, partialFilterExpression: { type: "METRIQUE" } },
@@ -33,6 +40,7 @@ evenementSchema.index(
 
 const Evenement = model("Evenement", evenementSchema, "evenements");
 
+// Un sous-schéma par type : champs propres à ce type d'événement.
 Evenement.discriminator(
   "REDEMARRAGE",
   new Schema({
@@ -53,12 +61,13 @@ Evenement.discriminator(
 Evenement.discriminator(
   "MAINTENANCE",
   new Schema({
-    technicienId: { type: Number }, // id PostgreSQL du technicien
+    technicienId: { type: Number },
     description: { type: String, required: true, trim: true, maxlength: 1000 },
     dureeMinutes: { type: Number, min: 0 },
   }),
 );
 
+// Définition de champ réutilisée pour cpu, ram et disque.
 const pourcentage = { type: Number, required: true, min: 0, max: 100 };
 Evenement.discriminator(
   "METRIQUE",
@@ -71,6 +80,8 @@ const parseDate = (value, nom) => {
   return date;
 };
 
+// Méthodes ajoutées au modèle : le contrôleur les appelle sans écrire de requête Mongo.
+// On écarte _id/createdAt fournis par le client, puis on crée via le bon sous-schéma.
 Evenement.enregistrer = async (serveurId, dto) => {
   const { _id, createdAt, ...data } = dto ?? {};
   if (!TYPES.includes(data.type)) {
@@ -99,7 +110,7 @@ Evenement.lister = async (serveurId, { type, debut, fin, limite }) => {
   return Evenement.find(filtre).sort({ date: -1 }).limit(max);
 };
 
-// Nombre d'événements par type, calculé par MongoDB.
+// Pipeline d'agrégation : MongoDB calcule le nombre d'événements par type.
 Evenement.statistiques = (serveurId) =>
   Evenement.aggregate([
     { $match: { serveurId } },
@@ -108,7 +119,7 @@ Evenement.statistiques = (serveurId) =>
     { $sort: { total: -1 } },
   ]);
 
-// Nombre d'alertes par jour et par serveur sur les 7 derniers jours, en un seul pipeline.
+// Alertes par jour et par serveur sur 7 jours, en un seul pipeline.
 Evenement.alertesParJour = () =>
   Evenement.aggregate([
     {

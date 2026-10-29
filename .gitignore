@@ -1,2 +1,3 @@
+# Dépendances réinstallables avec npm install, et secrets locaux.
 node_modules/
 .env

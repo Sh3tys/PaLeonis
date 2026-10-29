@@ -1,3 +1,6 @@
+// Routes : associe chaque URL + méthode HTTP à une fonction du contrôleur. Aucune logique ici.
+// Indicateurs agrégés en lecture seule (revenus, parc de serveurs).
+
 const express = require("express");
 const { getRevenus, getServeurs } = require("../controllers/dashboard.controller");
 

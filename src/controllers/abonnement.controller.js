@@ -1,3 +1,7 @@
+// Contrôleur : lit la requête (params, query, body), appelle le modèle, choisit le code HTTP.
+// Pas de SQL ici. Les erreurs non gérées remontent au gestionnaire central de server.js.
+// La validation et la transaction de souscription sont dans le modèle.
+
 const Abonnement = require("../models/abonnement.model");
 
 const listAbonnements = async (req, res) => {

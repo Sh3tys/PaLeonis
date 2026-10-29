@@ -1,5 +1,9 @@
+// Modèle SQL : seul endroit qui écrit des requêtes vers PostgreSQL pour cette table.
+// Héritage en base : client (commun) + particulier OU entreprise (spécifique).
+
 const pool = require("../db");
 
+// Requête de base réutilisée : les LEFT JOIN récupèrent les colonnes du sous-type.
 const SELECT_CLIENT = `
   SELECT c.id, c.type, c.email, c.tel, c.date_inscription, c.cree_le, c.modifie_le,
          p.nom, e.siret, e.raison_sociale
@@ -19,6 +23,7 @@ class Client {
     return rows[0] ?? null;
   }
 
+  // Vue détaillée : json_build_object construit les objets imbriqués directement en SQL.
   static async findFiche(id) {
     const client = await Client.findById(id);
     if (!client) return null;
@@ -46,6 +51,7 @@ class Client {
     return { ...client, abonnements: rows };
   }
 
+  // Deux INSERT liés (client + sous-type) : transaction pour ne jamais en garder un seul.
   static async createOne({ type, email, tel, nom, siret, raison_sociale }) {
     const db = await pool.connect();
     try {

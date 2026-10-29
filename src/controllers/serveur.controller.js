@@ -1,3 +1,6 @@
+// Contrôleur : lit la requête (params, query, body), appelle le modèle, choisit le code HTTP.
+// Pas de SQL ici. Les erreurs non gérées remontent au gestionnaire central de server.js.
+
 const Serveur = require("../models/serveur.model");
 const Technicien = require("../models/technicien.model");
 const Evenement = require("../models/evenement.model");
@@ -13,7 +16,7 @@ const getServeur = async (req, res) => {
   res.status(200).json(serveur);
 };
 
-// Suppression en cascade applicative : PostgreSQL d'abord, puis le journal MongoDB.
+// Interdit si le serveur est attribué. Cascade manuelle : PostgreSQL puis le journal MongoDB.
 const deleteServeur = async (req, res) => {
   const serveur = await Serveur.findById(req.params.id);
   if (!serveur) return res.status(404).json({ error: "Serveur introuvable." });
@@ -25,6 +28,8 @@ const deleteServeur = async (req, res) => {
   res.status(204).end();
 };
 
+// On vérifie dans PostgreSQL que le serveur (et le technicien éventuel) existe
+// avant d'écrire dans MongoDB, qui ne connaît pas ces tables.
 const createEvenement = async (req, res) => {
   const serveur = await Serveur.findById(req.params.id);
   if (!serveur) return res.status(404).json({ error: "Serveur introuvable." });

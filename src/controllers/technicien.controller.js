@@ -1,3 +1,6 @@
+// Contrôleur : lit la requête (params, query, body), appelle le modèle, choisit le code HTTP.
+// Pas de SQL ici. Les erreurs non gérées remontent au gestionnaire central de server.js.
+
 const Technicien = require("../models/technicien.model");
 
 const listTechniciens = async (req, res) => {
